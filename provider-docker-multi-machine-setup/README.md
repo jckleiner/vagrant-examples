@@ -6,7 +6,7 @@
 Since Virtualbox is not supported on the M1 Macbooks, using Virtualbox as a Vagrant provider is not possible.
 One solution is to use Docker as the provider. There might be other ways to do this (VMWare as the provider?) but this works for me.
 
-This Vagrant script sets up 2 virtual machines `vm1` and `vm2` in a private network using Docker as the provider.
+This Vagrant script sets up 2 virtual machines `vm1` and `vm2` (Ubuntu 20.04) in a private network using Docker as the provider.
 Both machines will have `docker` and `docker-compose` installed 
 and both machines will have an `nginx` container running inside them after the provisioning is finished.
 
