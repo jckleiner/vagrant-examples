@@ -1,21 +1,23 @@
 Vagrant.configure(2) do |config|
 
-  # ------------------------------ node1 ------------------------------
-  # ssh vagrant@127.0.0.1 -p 2001 -o StrictHostKeyChecking=no -i .vagrant/machines/node1/docker/private_key
-  config.vm.define "node1" do |node1|
-    node1.vm.network :private_network, type: "dhcp", docker_network__internal: true
-    node1.vm.network :private_network, ip: "172.20.128.11", netmask: "16"
+  # ------------------------------ vm1 ------------------------------
+  # ssh vagrant@127.0.0.1 -p 2001 -o StrictHostKeyChecking=no -i .vagrant/machines/vm1/docker/private_key
+  config.vm.define "vm1" do |vm1|
+    vm1.vm.network :private_network, type: "dhcp", docker_network__internal: true
+    vm1.vm.network :private_network, ip: "10.10.10.11", netmask: "16"
 
-    node1.vm.network :forwarded_port, id: "ssh", host: 2001, guest: 22
-    node1.vm.network :forwarded_port, id: "nginx", host: 8061, guest: 80
+    vm1.vm.network :forwarded_port, id: "ssh", host: 2001, guest: 22
+    vm1.vm.network :forwarded_port, id: "nginx", host: 8061, guest: 80
 
     # Custom configuration for docker
-    node1.vm.provider "docker" do |docker, override|
+    vm1.vm.provider "docker" do |docker, override|
       # docker doesnt use boxes
       override.vm.box = nil
 
       # this is where your Dockerfile lives
       docker.build_dir = "."
+
+      docker.name = "vm1"
 
       # Make sure it sets up ssh with the Dockerfile
       override.ssh.insert_key = true
@@ -26,9 +28,9 @@ Vagrant.configure(2) do |config|
     end
 
     # Provision Docker Engine and pull down PostgreSQL
-    node1.vm.provision :docker do |provision|
-      provision.pull_images "postgres:alpine"
-      provision.run "postgres:alpine", args: "-d -p 5432:5432 -e POSTGRES_PASSWORD=postgres"
+    vm1.vm.provision :docker do |provision|
+      # provision.pull_images "postgres:alpine"
+      # provision.run "postgres:alpine", args: "-d -p 5432:5432 -e POSTGRES_PASSWORD=postgres"
       provision.pull_images "nginx"
       provision.run "nginx", args: "-d -p 80:80"
     end
@@ -36,26 +38,28 @@ Vagrant.configure(2) do |config|
     # You first need to install a vagrant plugin on your machine: 'vagrant plugin install vagrant-docker-compose'
     # CAUTION: the repo is not maintained since Oct 2019 and tries to download an old docker-compose version by default which DOES NOT EXIST anymore
     # that's why we have to provide a version number
-    node1.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
+    vm1.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
 
   end
 
-  # ------------------------------ node2 ------------------------------
-  # ssh vagrant@127.0.0.1 -p 2002 -o StrictHostKeyChecking=no -i .vagrant/machines/node2/docker/private_key
-  config.vm.define "node2" do |node2|
-    node2.vm.network :private_network, type: "dhcp", docker_network__internal: true
-    node2.vm.network :private_network, ip: "172.20.128.12", netmask: "16"
+  # ------------------------------ vm2 ------------------------------
+  # ssh vagrant@127.0.0.1 -p 2002 -o StrictHostKeyChecking=no -i .vagrant/machines/vm2/docker/private_key
+  config.vm.define "vm2" do |vm2|
+    vm2.vm.network :private_network, type: "dhcp", docker_network__internal: true
+    vm2.vm.network :private_network, ip: "10.10.10.12", netmask: "16"
 
-    node2.vm.network :forwarded_port, id: "ssh", host: 2002, guest: 22
-    node2.vm.network :forwarded_port, id: "nginx", host: 8062, guest: 80
+    vm2.vm.network :forwarded_port, id: "ssh", host: 2002, guest: 22
+    vm2.vm.network :forwarded_port, id: "nginx", host: 8062, guest: 80
 
     # Custom configuration for docker
-    node2.vm.provider "docker" do |docker, override|
+    vm2.vm.provider "docker" do |docker, override|
       # docker doesnt use boxes
       override.vm.box = nil
 
       # this is where your Dockerfile lives
       docker.build_dir = "."
+
+      docker.name = "vm2"
 
       # Make sure it sets up ssh with the Dockerfile
       override.ssh.insert_key = true
@@ -66,9 +70,7 @@ Vagrant.configure(2) do |config|
     end
 
     # Provision Docker Engine and pull down PostgreSQL
-    node2.vm.provision :docker do |provision|
-      provision.pull_images "postgres:alpine"
-      provision.run "postgres:alpine", args: "-d -p 5432:5432 -e POSTGRES_PASSWORD=postgres"
+    vm2.vm.provision :docker do |provision|
       provision.pull_images "nginx"
       provision.run "nginx", args: "-d -p 80:80"
     end
@@ -76,7 +78,7 @@ Vagrant.configure(2) do |config|
     # You first need to install a vagrant plugin on your machine: 'vagrant plugin install vagrant-docker-compose'
     # CAUTION: the repo is not maintained since Oct 2019 and tries to download an old docker-compose version by default which DOES NOT EXIST anymore
     # that's why we have to provide a version number
-    node2.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
+    vm2.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
 
   end
 
