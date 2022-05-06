@@ -8,6 +8,7 @@ Vagrant.configure(2) do |config|
 
     vm1.vm.network :forwarded_port, id: "ssh", host: 2001, guest: 22
     vm1.vm.network :forwarded_port, id: "nginx", host: 8061, guest: 80
+    vm1.vm.network :forwarded_port, id: "consul", host: 8501, guest: 8500
 
     # Custom configuration for docker
     vm1.vm.provider "docker" do |docker, override|
@@ -27,7 +28,7 @@ Vagrant.configure(2) do |config|
       docker.privileged = true
     end
 
-    # Provision Docker Engine and pull down PostgreSQL
+    # Install Docker Engine and run containers
     vm1.vm.provision :docker do |provision|
       # provision.pull_images "postgres:alpine"
       # provision.run "postgres:alpine", args: "-d -p 5432:5432 -e POSTGRES_PASSWORD=postgres"
@@ -35,10 +36,14 @@ Vagrant.configure(2) do |config|
       provision.run "nginx", args: "-d -p 80:80"
     end
 
+    # Sync folder between host and guest
+    vm1.vm.synced_folder "./synced_vm1", "/home/vagrant/synced_folder"
+
     # You first need to install a vagrant plugin on your machine: 'vagrant plugin install vagrant-docker-compose'
     # CAUTION: the repo is not maintained since Oct 2019 and tries to download an old docker-compose version by default which DOES NOT EXIST anymore
-    # that's why we have to provide a version number
-    vm1.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
+    # that's why we have to provide a version number explicitly.
+    # We can also specify a docker-compose file which should be run on startup
+    vm1.vm.provision :docker_compose, compose_version: "v2.2.3", yml: "/home/vagrant/synced_folder/docker-compose.yml", run: "always"
 
   end
 
@@ -50,6 +55,7 @@ Vagrant.configure(2) do |config|
 
     vm2.vm.network :forwarded_port, id: "ssh", host: 2002, guest: 22
     vm2.vm.network :forwarded_port, id: "nginx", host: 8062, guest: 80
+    vm2.vm.network :forwarded_port, id: "consul", host: 8502, guest: 8500
 
     # Custom configuration for docker
     vm2.vm.provider "docker" do |docker, override|
@@ -69,16 +75,20 @@ Vagrant.configure(2) do |config|
       docker.privileged = true
     end
 
-    # Provision Docker Engine and pull down PostgreSQL
+    # Install Docker Engine and run containers
     vm2.vm.provision :docker do |provision|
       provision.pull_images "nginx"
       provision.run "nginx", args: "-d -p 80:80"
     end
 
+    # Sync folder between host and guest
+    vm2.vm.synced_folder "./synced_vm2", "/home/vagrant/synced_folder"
+
     # You first need to install a vagrant plugin on your machine: 'vagrant plugin install vagrant-docker-compose'
     # CAUTION: the repo is not maintained since Oct 2019 and tries to download an old docker-compose version by default which DOES NOT EXIST anymore
     # that's why we have to provide a version number
-    vm2.vm.provision :docker_compose, compose_version: "v2.2.3" #, yml: "some.yml"
+    # We can also specify a docker-compose file which should be run on startup
+    vm2.vm.provision :docker_compose, compose_version: "v2.2.3", yml: "/home/vagrant/synced_folder/docker-compose.yml", run: "always"
 
   end
 

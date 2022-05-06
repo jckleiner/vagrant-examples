@@ -7,13 +7,16 @@ Since Virtualbox is not supported on the M1 Macbooks, using Virtualbox as a Vagr
 One solution is to use Docker as the provider. There might be other ways to do this (VMWare as the provider?) but this works for me.
 
 This Vagrant script sets up 2 virtual machines `vm1` and `vm2` (Ubuntu 20.04) in a private network using Docker as the provider.
-Both machines will have `docker` and `docker-compose` installed 
-and both machines will have an `nginx` container running inside them after the provisioning is finished.
+Both machines will have:
+ * `docker` and `docker-compose` installed.
+ * An `nginx` container running inside them, started as a single docker container
+ * A `consul` instance running, started from a docker-compose file
 
 ### Requirements
 The docker-compose plugin needs to be installed on the host machine: `vagrant plugin install vagrant-docker-compose`.
 ### Run / Test 
-Run `vagrant up`.
+Run `vagrant up` to start all VMs.
+Run `vagrant reload` to reload the changed config in `Vagrantfile`.
 
 After the setup is finished, validate that the Docker containers started:
  * Run `docker ps`
