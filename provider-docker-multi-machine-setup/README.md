@@ -10,11 +10,10 @@ This Vagrant script sets up 2 virtual machines `vm1` and `vm2` (Ubuntu 20.04) in
 Both machines will have `docker` and `docker-compose` installed 
 and both machines will have an `nginx` container running inside them after the provisioning is finished.
 
-### Run / Test 
-
+### Requirements
 The docker-compose plugin needs to be installed on the host machine: `vagrant plugin install vagrant-docker-compose`.
-
-After that run `vagrant up`.
+### Run / Test 
+Run `vagrant up`.
 
 After the setup is finished, validate that the Docker containers started:
  * Run `docker ps`
@@ -32,11 +31,13 @@ Test the connection `host -> vm2`:
 
 Test the connection `vm1 -> vm2`: 
  * Connect to virtual machine 1: `vagrant ssh vm1`
+ * Check if the `nginx` container is running: `docker ps`
  * Send a request to virtual machine 2: `curl -I http://10.10.10.12`
  * You should see a 200 OK response
 
 Test the connection `vm2 -> vm1`: 
  * Connect to virtual machine 2: `vagrant ssh vm2`
+ * Check if the `nginx` container is running: `docker ps`
  * Send a request to virtual machine 1: `curl -I http://10.10.10.11`
  * You should see a 200 OK response
 

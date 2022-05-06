@@ -3,12 +3,33 @@
 # Adds Puppet, SSH daemon, Systemd
 # Adapted from https://github.com/BashtonLtd/docker-vagrant-images/blob/master/ubuntu1404/Dockerfile
 
+# TODO ubuntu:22.04 gives error "Vagrant ssh authentication failure"
 FROM ubuntu:20.04
+
 ENV container docker
-RUN apt-get update -y && apt-get dist-upgrade -y
+ENV LANG=en_US.UTF-8
+# Avoiding user interaction with tzdata
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies, you may not need all of these
-RUN apt-get install -y --no-install-recommends ssh sudo libffi-dev systemd openssh-client
+RUN apt-get update -y \
+    && apt-get dist-upgrade -y \
+    && apt-get install -y --no-install-recommends \
+                    ssh \
+                    sudo \
+                    libffi-dev \
+                    systemd \
+                    openssh-client \
+                    ansible \
+                    openjdk-17-jdk-headless \
+                    maven \
+                    curl \
+                    debianutils \
+                    git \
+                    jq \
+                    rsync \
+                    wget \
+    && apt-get clean
 
 # Needed to run systemd
 # VOLUME [ "/sys/fs/cgroup" ]
